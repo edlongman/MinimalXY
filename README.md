@@ -33,7 +33,26 @@ Screenshots
 
 How to use
 ----------
+### Javascript/Nunjucks/KeystoneJS
+This template requires custom variables and is setup with some of the Keystone defaults.
+To set variables in KeystoneJS set them either in the middleware `initLocals` function.
+Or set them in the javascript file for the route, e.g. `gallery.js`.
+They are set as locals.{variable_in_template_scope}, e.g.
+`locals.section = 'example'` means that `{{ section }}` evaluates to `example`.
+```javascript
+//Keystone added variables
+section = 'The first part of the url after the root';
+data.post = {};//Information about the post if in a blog page
+title = 'The value of the <title> element';
 
+//Template added variables (these don't exist by default in nunjucks/keystone)
+siteurl = 'www.example.com';
+sitename = 'example website';
+
+description = 'Page description for tag lines and meta tags'
+```
+
+Originally these value were set for the Python Pelican Theme.
 ```python
 # Theme
 THEME = '/path/to/MinimalXY'

@@ -4,53 +4,57 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <title>{% block title %}{{ SITENAME }}{% endblock title %}</title>
+    <title>{% block title %}{{ title|default(sitename) }}{% endblock title %}</title>
 
     <!-- Meta -->
-    <meta name="description" content="{{ SITENAME }} &ndash; {{ SITESUBTITLE }}">
+    <meta name="description" content="{{ title|default(sitename) }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Social -->
-    {% if article %}
-    <meta property="article:author" content="{{ article.author }}" />
-    <meta property="article:section" content="{{ article.category }}" />
-    <meta property="article:published_time" content="{{ article.date.strftime("%Y-%m-%d") }}" />
+    {% if data.post %}
+    <meta property="article:author" content="{ data.post.author }}" />
+    <meta property="article:section" content="{{ data.post.categories[0] }}" />
+    <meta property="article:published_time" content="{{ data.post._.publishedDate.format("yyyy-mm-dd") }}" />
 
     <meta property="og:type" content="article"/>
-    <meta property="og:title" content="{{ article.title|striptags }}"/>
-    <meta property="og:description" content="{{ article.summary|striptags|escape }}"/>
-    <meta property="og:site_name" content="{{ SITENAME }}" />
-    <meta property="og:url" content="{{ SITEURL }}/{{ article.url }}"/>
+    <meta property="og:title" content="{{ data.post.title|striptags }}"/>
+    <meta property="og:description" content="{{ data.post.content.brief|striptags|escape }}"/>
+    <meta property="og:site_name" content="{{ sitename}}" />
+    <meta property="og:url" content="{{ siteurl }}/blog/post/{{ data.post.slug }}"/>
 
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="{{ article.title|striptags }}">
-    <meta name="twitter:description" content="{{ article.summary|striptags|escape }}">
-    <meta name="twitter:url" content="{{ SITEURL }}/{{ article.url }}">
-    {% elif page %}
+    <meta name="twitter:title" content="{{ data.post.title|striptags }}">
+    <meta name="twitter:description" content="{{ data.post.content.brief|striptags|escape }}">
+    <meta name="twitter:url" content="{{ siteurl }}/blog/post/{{ data.post.slug }}">
+    {% elif locals.section %}
     <meta property="og:type" content="article"/>
-    <meta property="og:title" content="{{ page.title }}"/>
-    <meta property="og:description" content="{{ SITESUBTITLE }}"/>
-    <meta property="og:site_name" content="{{ SITENAME }}" />
-    <meta property="og:url" content="{{ SITEURL }}/{{ page.url }}"/>
+    <meta property="og:title" content="{{ title }}"/>
+    <meta property="og:description" content="{{ description }}"/>
+    <meta property="og:site_name" content="{{ sitename }}" />
+    {% if locals.section == 'home' %}
+    <meta property="og:url" content="{{ siteurl }}/"/>
+    {% else %}
+    <meta property="og:url" content="{{ siteurl }}/{{ locals.section }}"/>
+    {% endif %}
     <meta property="og:image" content="{{ AUTHOR_AVATAR }}"/>
 
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="{{ page.title }}">
-    <meta name="twitter:description" content="{{ SITESUBTITLE }}">
-    <meta name="twitter:url" content="{{ SITEURL }}/{{ page.url }}">
+    <meta name="twitter:title" content="{{ title }}">
+    <meta name="twitter:description" content="{{ description }}">
+    <meta name="twitter:url" content="{{ siteurl }}/{{ locals.section }}">
     <meta name="twitter:image" content="{{ AUTHOR_AVATAR }}">
     {% else %}
     <meta property="og:type" content="website"/>
-    <meta property="og:title" content="{{ SITENAME }}"/>
-    <meta property="og:description" content="{{ SITESUBTITLE }}"/>
-    <meta property="og:site_name" content="{{ SITENAME }}" />
-    <meta property="og:url" content="{{ SITEURL }}"/>
+    <meta property="og:title" content="{{ sitename }}"/>
+    <meta property="og:description" content=""/>
+    <meta property="og:site_name" content="{{ sitename }}" />
+    <meta property="og:url" content="{{ siteurl }}"/>
     <meta property="og:image" content="{{ AUTHOR_AVATAR }}"/>
 
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="{{ SITENAME }}">
-    <meta name="twitter:description" content="{{ SITESUBTITLE }}">
-    <meta name="twitter:url" content="{{ SITEURL }}">
+    <meta name="twitter:title" content="{{ sitename }}">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:url" content="{{ siteurl }}">
     <meta name="twitter:image" content="{{ AUTHOR_AVATAR }}">
     {% endif %}
 
@@ -85,60 +89,67 @@
 
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:regular,bold">
-    <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/w3.css">
-    <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/style.css">
-    <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/jqcloud.css">
-    <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/pygments-highlight-github.css">
+    <link rel="stylesheet" type="text/css" href="{{ siteurl }}/css/w3.css">
+    <link rel="stylesheet" type="text/css" href="{{ siteurl }}/css/style.css">
+    <link rel="stylesheet" type="text/css" href="{{ siteurl }}/css/jqcloud.css">
+    <link rel="stylesheet" type="text/css" href="{{ siteurl }}/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ siteurl }}/css/pygments-highlight-github.css">
     {% if MINIMALXY_CUSTOM_CSS %}
-    <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/{{ MINIMALXY_CUSTOM_CSS }}">
+    <link rel="stylesheet" type="text/css" href="{{ siteurl }}/{{ MINIMALXY_CUSTOM_CSS }}">
     {% endif %}
 
     <!-- Icon -->
-    {% if MINIMALXY_FAVICON %}
-    <link rel="shortcut icon" type="image/x-icon" href="{{ SITEURL }}/{{ MINIMALXY_FAVICON }}">
-    {% endif %}
+		<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 
     <!-- JavaScript -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script src="{{ SITEURL }}/theme/js/jqcloud.min.js"></script>
+    <script src="{{ siteurl }}/js/jqcloud.min.js"></script>
   </head>
 
   <body>
     <div class="w3-row w3-card w3-white">
       <header id="header">
-        {% if " " in AUTHOR %}
-        <a href="{{ SITEURL }}" id="header-logo" title="Home">{{ AUTHOR[0] + AUTHOR[AUTHOR.index(" ")+1] }}</a>
+        {% if " " in author %}
+        <a href="{{ siteurl }}" id="header-logo" title="Home">{{ author[0] + author[author.index(" ")+1] }}</a>
         {% else %}
-        <a href="{{ SITEURL }}" id="header-logo" title="Home">{{ AUTHOR[0] }}</a>
+        <a href="{{ siteurl }}" id="header-logo" title="Home">{{ author[0] }}</a>
         {% endif %}
         <nav id="header-menu">
           <ul>
-            {% if DISPLAY_PAGES_ON_MENU %}
-            {% for p in pages %}
-            <li{% if p==page %} class="active" {% endif %}><a href="{{ SITEURL }}/{{ p.url }}">{{ p.title }}</a></li>
+            {% for link in navLinks %}
+            <li{% {{ 'active' if link.key == section else '' }} %}><a href="{{ link.href }}">{{ link.label }}</a></li>
             {% endfor %}
-            {% endif %}
-            {% if DISPLAY_CATEGORIES_ON_MENU %}
-            {% for cat, null in categories %}
-            {% if cat != DEFAULT_CATEGORY %}
-            <li class="w3-bottombar w3-border-white w3-hover-border-green" {% if cat == category %}style="font-weight: bold;"{% endif %}><a href="{{ SITEURL }}/{{ cat.url }}">{{ cat }}</a></li>
-            {% endif %}
-            {% endfor %}
-            {% endif %}
-            {% for title, link in MENUITEMS %}
-            <li class="w3-bottombar w3-border-white w3-hover-border-green"><a href="{{ link }}">{{ title }}</a></li>
-            {% endfor %}
+						{% if user %}
+							{% if user.canAccessKeystone %}
+							<li><a href="/keystone">Open Keystone</a></li>
+							{% endif %}
+							<li><a href="/keystone/signout">Sign Out</a></li>
+						{% else %}
+							<li><a href="/keystone/signin">Sign In</a></li>
+						{% endif %}
           </ul>
         </nav>
       </header>
     </div>
 
-    {% block content_title %}
-    {% endblock %}
+  	{# BODY #}
+  	<div id="body">
+  		{# NOTE:
+  		   There is no .container wrapping class around body blocks to allow more flexibility in design.
+  		   Remember to include it in your templates when you override the intro and content blocks! #}
 
-    {% block content %}
-    {% endblock %}
+  		{# The Intro block appears above flash messages (used for temporary information display) #}
+  		{% block intro %}{% endblock %}
+
+  		{# Flash messages allow you to display once-off status messages to users, e.g. form
+  		   validation errors, success messages, etc. #}
+  		{{ FM.flashMessages(messages) }}
+      {% block content_title %}
+      {% endblock %}
+
+      {% block content %}
+      {% endblock %}
+		</div>
 
     <footer id="footer">
       <div id="footer-copyright" class="w3-center w3-small w3-text-grey w3-padding-48">
@@ -147,9 +158,11 @@
           {% if MINIMALXY_START_YEAR and MINIMALXY_CURRENT_YEAR %}
           {{ MINIMALXY_START_YEAR }}{% if MINIMALXY_START_YEAR != MINIMALXY_CURRENT_YEAR %}&dash;{{ MINIMALXY_CURRENT_YEAR }}{% endif %}
           {% endif %}
-          {{ AUTHOR }}
+          {{ author }}
           {% if FEED_ALL_ATOM %} | <a href="{{ FEED_DOMAIN }}/{{ FEED_ALL_ATOM }}">Atom feed <i class="fa fa-rss" aria-hidden="true"></i></a>{% endif %}
         </span>
+  			<p>Powered by <a href="http://keystonejs.com" target="_blank">KeystoneJS</a>
+           and a Modified <a href="https://github.com/edlongman/MinimalXY" target="_blank">MinimalXY Template</a></p>
       </div>
     </footer>
 
